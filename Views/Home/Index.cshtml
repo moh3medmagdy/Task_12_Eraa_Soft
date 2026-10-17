@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+}
+
+<style>
+    body {
+        background-image: url('/images/1.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    .welcome-card {
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .welcome-card h1,
+    .welcome-card h5,
+    .welcome-card strong {
+        color: #212529 !important;
+    }
+
+    .welcome-card p {
+        color: #495057 !important;
+    }
+
+    .welcome-card hr {
+        border-color: #6c757d;
+        opacity: 0.5;
+    }
+</style>
+
+<div class="container text-center mt-5">
+    <div class="welcome-card p-5">
+        <h1 class="display-4 fw-bold mb-3">Welcome to ToDoListApp</h1>
+        <p class="lead mb-4">
+            Organize your tasks, manage deadlines, and track your progress effortlessly. Our app helps you stay productive and focused every day.
+        </p>
+
+        <div class="mb-4">
+            <a asp-controller="TodoItem" asp-action="Index" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow">
+                View Your Tasks
+            </a>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="text-start mt-3">
+            <h5 class="fw-bold mb-3">Why use ToDoListApp?</h5>
+            <p class="small mb-2">
+                <strong>Simple interface:</strong> Because keeping track of your daily tasks shouldn't be a hassle. With our clean and simple interface, you can add, edit, and delete tasks with ease.
+            </p>
+            <p class="small mb-2">
+                <strong>Stay on top of deadlines:</strong> The app highlights urgent tasks so you never miss important deadlines. You can filter by date and quickly see what's due soon.
+            </p>
+            <p class="small">
+                <strong>File attachments:</strong> Upload files to your tasks and access them directly from the app. Everything is organized in one place for maximum efficiency.
+            </p>
+        </div>
+    </div>
+</div>

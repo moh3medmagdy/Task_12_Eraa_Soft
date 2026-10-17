@@ -1,0 +1,135 @@
+﻿@model IEnumerable<ToDoList.Models.TodoItem>
+
+@{
+    ViewData["Title"] = "Task List";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string searchDate = ViewBag.SearchDate;
+}
+
+<h2 class="mb-3 text-dark">My To-Do List</h2>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a asp-action="Create" class="btn btn-primary px-4 shadow-sm">Create New Task</a>
+</div>
+
+<form asp-action="Index" method="get" class="row g-2 mb-4">
+    <div class="col-auto">
+        <input type="date" name="searchDate" value="@searchDate" class="form-control" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-secondary px-3">Filter by Date</button>
+        <a asp-action="Index" class="btn btn-outline-dark px-3">Reset</a>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-hover table-bordered align-middle bg-white rounded shadow-sm">
+        <thead class="table-light">
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Deadline</th>
+                <th>File</th>
+                <th class="text-center" style="width: 170px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">No tasks found.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model)
+                {
+                  
+                    bool isCloseOrOverdue = item.Deadline <= DateTime.Now.AddHours(24) && item.Deadline >= DateTime.Now;
+                    bool isOverdue = item.Deadline < DateTime.Now;
+
+                    <tr>
+                        <td class="fw-bold">@item.Title</td>
+                        <td>@item.Description</td>
+                        <td>
+                            <span class="@((isCloseOrOverdue || isOverdue) ? "text-danger fw-bold" : "")">
+                                @item.Deadline.ToString("yyyy-MM-dd HH:mm")
+                            </span>
+                            
+                            @if (isOverdue)
+                            {
+                                <span class="badge bg-danger ms-1">Overdue</span>
+                            }
+                            else if (isCloseOrOverdue)
+                            {
+                                <span class="badge bg-warning text-dark ms-1">Due Soon</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.FilePath))
+                            {
+                                <a asp-action="DownloadFile" asp-route-filePath="@item.FilePath" class="btn btn-sm btn-outline-primary">
+                                    Download
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">No File</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning text-dark fw-bold me-1">Edit</a>
+                            
+                            <form id="delete-form-@item.Id" asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="confirmDelete(@item.Id)">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<!--  Pagination -->
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+            <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-searchDate="@searchDate">Previous</a>
+        </li>
+
+        @for (int i = 1; i <= Math.Max(1, totalPages); i++)
+        {
+            <li class="page-item @(i == currentPage ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchDate="@searchDate">@i</a>
+            </li>
+        }
+
+        <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+            <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-searchDate="@searchDate">Next</a>
+        </li>
+    </ul>
+</nav>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+        }
+    </script>
+}
